@@ -1,4 +1,8 @@
 import numpy as np
+import logging 
+
+LOGGING_LEVEL = logging.INFO
+logging.basicConfig(level=LOGGING_LEVEL, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # =========================================================
 # 1. Power method for dominant eigenpair
@@ -27,8 +31,28 @@ def power_method(A, x0, maxit, tol):
     iters : int
         Number of iterations performed.
     """
-    # TODO: implement the power method
-    raise NotImplementedError("power_method not implemented")
+    lam_0 = x0 @ A @ x0
+    iters = 0
+    while iters < maxit:
+        iters += 1
+        # Power iteration
+        y = A @ x0
+        x0 = y / np.linalg.norm(y, ord=2)
+        lam = x0 @ A @ x0
+
+        # Convergence check in relative error
+        err = abs(lam - lam_0) / abs(lam)
+        logging.debug(f"iters = {iters}, lam_k = {lam}, err = {err}")
+        if err < tol:
+            break
+
+        # Set up for next iteration 
+        lam_0 = lam
+
+    if iters == maxit:
+        logging.error(f"Convergence not achieved after {maxit} iterations.")
+    return lam, x0, iters
+
 
 
 # =========================================================

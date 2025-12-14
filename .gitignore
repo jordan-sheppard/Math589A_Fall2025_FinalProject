@@ -9,4 +9,5 @@ venv/
 *.swp
 *.swo
 .DS_Store
-
+.vscode/
+*.pdf

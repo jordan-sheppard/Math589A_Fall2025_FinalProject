@@ -8,7 +8,7 @@ logging.basicConfig(level=LOGGING_LEVEL, format='%(asctime)s - %(levelname)s - %
 # 1. Power method for dominant eigenpair
 # =========================================================
 
-def power_method(A, x0, maxit, tol):
+def power_method(A: np.ndarray, x0: np.ndarray, maxit: int, tol: float):
     """Approximate the dominant eigenvalue and eigenvector of a real symmetric matrix A.
 
     Parameters
@@ -58,8 +58,7 @@ def power_method(A, x0, maxit, tol):
 # =========================================================
 # 2. Rank-k image compression via SVD
 # =========================================================
-
-def svd_compress(image, k):
+def svd_compress(image: np.ndarray, k: int):
     """Compute a rank-k approximation of a grayscale image using SVD.
 
     Parameters
@@ -78,8 +77,17 @@ def svd_compress(image, k):
     compression_ratio : float
         (Number of stored parameters in image_k) / (m * n).
     """
-    # TODO: implement SVD-based rank-k approximation
-    raise NotImplementedError("svd_compress not implemented")
+    m, n = image.shape
+    max_rank = min(m,n)
+    if k <= 0 or k > max_rank:
+        raise ValueError(f"Provided rank out of bounds. Should be in [1, max_rank] = [1, {max_rank}]")
+    
+    U, S, Vh = np.linalg.svd(image, full_matrices=False)
+    image_k = (U[:,:k] * S[:k]) @ Vh[:k,:]
+    rel_error = np.linalg.norm(image - image_k, ord='fro') / np.linalg.norm(image, ord='fro')
+    compression_ratio = k * (m + n + 1) / (m * n)
+    
+    return image_k, rel_error, compression_ratio
 
 
 # =========================================================

@@ -114,7 +114,7 @@ def svd_features(image, p):
     energies = np.cumsum(singular_values) / np.sum(singular_values)
     r_0_9 = np.argmax(energies >= 0.9) + 1
     r_0_95 = np.argmax(energies >= 0.95) + 1
-    return np.hstack((energies[:p], [r_0_9, r_0_95]))
+    
 
 
 

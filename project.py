@@ -139,9 +139,30 @@ def lda_train(X, y):
     threshold : float
         Threshold in 1D projected space for classifying 0 vs 1.
     """
-    # TODO: implement two-class LDA training
-    raise NotImplementedError("lda_train not implemented")
+    # Separate out two training classes
+    X_A = X[y == 0, :]
+    X_B = X[y == 1, :]
 
+    # Find class means
+    mu_A = np.mean(X_A, axis=0)     # Should be shape (d,) array
+    mu_B = np.mean(X_B, axis=0)     # Should be shape (d,) array
+    X_A_centered = X_A - mu_A       # Should be shape (N_A, d) array
+    X_B_centered = X_B - mu_B       # Should be shape (N_B, d) array
+
+    # Create within-class scatter matrix
+    S_W = (X_A_centered.T @ X_A_centered) + (X_B_centered.T @ X_B_centered) # Should be shape (d,d) array
+
+    # Create discriminant direction vector
+    LAMBDA = 1e-6       # Regularization parameter 
+    S_W_reg = S_W + LAMBDA * np.eye(S_W.shape[0])       # Should be shape (d,d) array
+    w = np.linalg.solve(S_W_reg, mu_B - mu_A)           # Should be shape (d,) array
+
+    # Find threshold value 
+    m_A = np.mean(X_A @ w)
+    m_B = np.mean(X_B @ w)
+    threshold = (m_A + m_B) / 2.
+
+    return w, threshold
 
 # =========================================================
 # 5. Two-class LDA: prediction
@@ -164,8 +185,9 @@ def lda_predict(X, w, threshold):
     y_pred : (N,) ndarray
         Predicted labels (0 or 1).
     """
-    # TODO: implement LDA prediction
-    raise NotImplementedError("lda_predict not implemented")
+    projections = X @ w 
+    in_B = projections >= threshold
+    return 1 * in_B     # 1 if in B, 0 if in A
 
 
 # =========================================================

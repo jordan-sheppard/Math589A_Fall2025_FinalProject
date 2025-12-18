@@ -110,8 +110,12 @@ def svd_features(image, p):
         Feature vector consisting of:
         [normalized sigma_1, ..., normalized sigma_p, r_0.9, r_0.95]
     """
-    # TODO: implement SVD feature extraction
-    raise NotImplementedError("svd_features not implemented")
+    singular_values = np.linalg.svd(image, compute_uv = False)
+    energies = np.cumsum(singular_values) / np.sum(singular_values)
+    r_0_9 = np.argmax(energies >= 0.9) + 1
+    r_0_95 = np.argmax(energies >= 0.95) + 1
+    return np.hstack((energies[:p], [r_0_9, r_0_95]))
+
 
 
 # =========================================================
